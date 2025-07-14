@@ -81,6 +81,12 @@ button {
     text-align: right;
     font-weight: 600;
 }
+.entry-date {
+  flex: 0 0 100px;
+  margin-right: 0.5rem;
+  font-size: 0.875rem;
+  color: #666;
+}
 .entry button {
     background: transparent;
     border: none;
@@ -89,3 +95,22 @@ button {
     cursor: pointer;
 }
 .entry button:hover { color: #000; }
+.entry-category {
+  margin-right: 0.5rem;
+  font-weight: 600;
+}
+.error {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: #e63946; /* red */
+}
+.error[hidden] {
+  display: none !important;
+}
+.month-header {
+  list-style: none;
+  margin: 1.5rem 0 0.5rem;
+  font-weight: 600;
+  color: #333;
+}

@@ -1,33 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Budget Tracker</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>Budget Tracker</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<h1>💰 Budget Tracker</h1>
-<p>Log your income and expenses below. All data is saved in your browser so it will still be here when you come back.</p>
+  <div class="container">
+    <header>
+      <h1>💰 My Budget Tracker</h1>
+      <p>Log income & expenses — your data stays in localStorage.</p>
+    </header>
 
-<form id="entryForm">
-    <input type="text" id="descInput" placeholder="Description" required>
-    <input type="number" id="amountInput" placeholder="Amount" step="0.01" required>
-    <select id="typeInput">
-        <option value="income">Income</option>
-        <option value="expense">Expense</option>
-    </select>
-    <button type="submit">Add</button>
-</form>
+    <!-- ── Floating-label form (vertical) ───────────────────── -->
+    <section class="form-section">
+      <form id="entryForm">
+        <div class="field">
+          <input id="descInput" type="text" placeholder=" " required />
+          <label for="descInput">Description</label>
+          <small id="descError" class="error" hidden>Please enter a description.</small>
+        </div>
 
-<div id="summary">
-    <div class="sum-card income">Income: <span id="totalIncome">$0.00</span></div>
-    <div class="sum-card expense">Expenses: <span id="totalExpense">$0.00</span></div>
-    <div class="sum-card balance">Balance: <span id="balance">$0.00</span></div>
-</div>
+        <div class="field">
+          <input id="amountInput" type="number" step="0.01" placeholder=" " required />
+          <label for="amountInput">Amount</label>
+          <small id="amountError" class="error" hidden>Please enter a positive number.</small>
+        </div>
 
-<ul id="entries"></ul>
+        <div class="field">
+          <select id="typeInput" required>
+            <option value="" disabled selected hidden>Type</option>
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
+          </select>
+          <label for="typeInput">Type</label>
+        </div>
 
-<script type="module" src="app.js"></script>
+        <div class="field">
+          <select id="categoryInput" required>
+            <option value="" disabled selected hidden>Choose type first…</option>
+          </select>
+          <label for="categoryInput">Category</label>
+        </div>
+
+        <button type="submit">Add</button>
+      </form>
+    </section>
+
+    <!-- Summary cards injected by JS -->
+    <section id="summary" class="summary-section"></section>
+
+    <!-- Filter -->
+    <section class="filter-section">
+      <label for="filterInput">Show:</label>
+      <select id="filterInput">
+        <option value="all">All</option>
+      </select>
+    </section>
+
+    <!-- Donut chart -->
+    <section class="chart-section">
+      <canvas id="balanceChart" width="400" height="200"></canvas>
+    </section>
+
+    <!-- Entries -->
+    <section class="entries-section">
+      <ul id="entries"></ul>
+    </section>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module" src="app.js"></script>
 </body>
 </html>

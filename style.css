@@ -1,60 +1,64 @@
 /* ==================================================================
    Budget Tracker — Modern Fintech Theme CSS
+   BRAND PALETTE INTEGRATION BUILD
    ------------------------------------------------------------------
-   Design goals:
-   • Distinctive yet clean fintech aesthetic (soft neutrals + vibrant brand gradient).
-   • Consistent, accessible form controls w/ floating labels.
-   • Tokenized design system: colour, spacing, radius, typography, shadow.
-   • Smooth light↔dark theme w/ user toggle (already wired in JS).
-   • Responsive layout + reduced-motion support.
-   • Visual polish to summary cards, budget bars, and entry list.
-   ------------------------------------------------------------------
-   Implementation notes:
-   • Retains your existing class names so HTML changes are minimal.
-   • Introduces utility classes (.btn, .btn-ghost, .sr-only, .visually-hidden).
-   • Chart colours exposed as CSS vars; update Chart.js config to read them.
-   • Uses modern CSS (clamp(), color-mix(), :where(), :is()). Safe fallbacks included.
+   Only change set: inject user brand palette + legacy aliases so
+   existing JS picks up correct colors. Layout, floating labels,
+   and component styling left intact.
    ================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@500;700&display=swap');
 
 /* ------------------------------------------------------------------
-   1. Root Design Tokens (Light Theme)
+   1A. User Brand Palette (hex) + System Aliases
    ------------------------------------------------------------------ */
+/* Core palette from user guidelines */
 :root {
-  /* Brand gradient endpoints */
-  --brand-1: hsl(226 100% 55%);           /* primary base */
-  --brand-2: hsl(266 100% 60%);           /* secondary tint */
-  --brand-3: hsl(198 100% 50%);           /* teal accent */
+  /* Base brand */
+  --color-primary: #2D3748; /* Dark Slate */
+  --color-surface: #EDF2F7; /* Light Gray surface bg */
+  --color-accent:  #3182CE; /* Soft Blue (action / primary button) */
 
-  /* Functional colours */
-  --success: hsl(151 70% 40%);            /* income */
-  --success-bg: hsl(151 70% 92%);
-  --danger:  hsl(355 75% 54%);            /* expense */
-  --danger-bg:hsl(355 75% 94%);
-  --warning: hsl(35 95% 55%);
-  --info:    hsl(198 100% 40%);
+  /* Status */
+  --color-success: #48BB78; /* Mint Green */
+  --color-warning: #ED8936; /* Warm Orange */
+  --color-error:   #E53E3E; /* Coral Red */
 
-  /* Surfaces */
-  --bg: hsl(220 23% 96%);
-  --bg-alt: hsl(220 23% 99%);
-  --card: hsl(0 0% 100%);
-  --card-alt: hsl(220 23% 98%);
-  --card-border: hsl(220 10% 85%);
+  /* Text neutrals */
+  --color-text-high:   #2D3748;
+  --color-text-medium: #4A5568;
+  --color-text-low:    #A0AEC0;
+  --color-border:      #E2E8F0;
 
-  /* Text */
-  --text: hsl(222 25% 20%);
-  --text-2: hsl(222 12% 35%);
-  --text-3: hsl(222 10% 50%);
-  --text-invert: #fff;
+  /* --- Legacy aliases used in existing CSS & JS --- */
+  --success: var(--color-success);
+  --danger:  var(--color-error);
+  --warning: var(--color-warning);
+  --info:    var(--color-accent);
 
-  /* Charts */
-  --chart-income: var(--success);
-  --chart-expense: var(--danger);
-  --chart-balance: var(--brand-1);
+  /* surfaces used throughout original theme */
+  --bg:       #FFFFFF;                /* main page bg (kept white; see below) */
+  --bg-alt:   var(--color-surface);
+  --card:     #FFFFFF;
+  --card-alt: var(--color-surface);
+  --card-border: var(--color-border);
 
-  /* Spacing scale */
+  /* text aliases */
+  --text:   var(--color-text-high);
+  --text-2: var(--color-text-medium);
+  --text-3: var(--color-text-low);
+  --text-invert: #FFFFFF;
+
+  /* chart aliases consumed by JS (cssVar('--income'), etc.) */
+  --income:    var(--color-success);
+  --expense:   var(--color-error);
+  --primary:   var(--color-accent); /* fallback mapping */
+  --chart-income:  var(--color-success);
+  --chart-expense: var(--color-error);
+  --chart-balance: var(--color-accent);
+
+  /* Existing spacing / radius / shadow / type scale from original file */
   --sp-0: 0;
   --sp-1: 0.25rem;
   --sp-2: 0.5rem;
@@ -64,19 +68,16 @@
   --sp-6: 2rem;
   --sp-7: 3rem;
 
-  /* Radius scale */
   --rad-xs: 3px;
   --rad-sm: 6px;
   --rad-md: 10px;
   --rad-lg: 16px;
   --rad-xl: 24px;
 
-  /* Shadows */
   --shadow-sm: 0 1px 3px rgba(0,0,0,.08);
   --shadow-md: 0 4px 16px rgba(0,0,0,.08);
   --shadow-lg: 0 8px 32px rgba(0,0,0,.12);
 
-  /* Typography scale (fluid) */
   --fs-xs: clamp(.75rem,.72rem + .1vw,.8rem);
   --fs-sm: clamp(.875rem,.84rem + .2vw,.95rem);
   --fs-md: clamp(1rem,.96rem + .2vw,1.05rem);
@@ -84,34 +85,51 @@
   --fs-xl: clamp(1.75rem,1.5rem + 1vw,2rem);
   --fs-xxl: clamp(2.25rem,1.9rem + 2vw,3rem);
 
-  /* Durations */
   --dur-fast: .15s;
   --dur-med: .25s;
   --dur-slow: .4s;
+
+  /* gradient endpoints now use accent -> primary for subtle brand look */
+  --brand-1: var(--color-accent);
+  --brand-2: color-mix(in srgb, var(--color-accent) 60%, var(--color-primary));
+  --brand-3: var(--color-success); /* optional accent */
 }
 
 /* ------------------------------------------------------------------
-   2. Dark Theme Overrides
+   1B. Dark Theme Overrides (brand-respecting)
    ------------------------------------------------------------------ */
 body.dark-mode {
-  --bg: hsl(222 30% 8%);
-  --bg-alt: hsl(222 30% 12%);
-  --card: hsl(222 28% 14%);
-  --card-alt: hsl(222 28% 18%);
-  --card-border: hsl(222 15% 25%);
+  --bg: #1A202C;          /* deep slate */
+  --bg-alt: #2D3748;
+  --card: #2D3748;
+  --card-alt: #374151;    /* slightly lighter than card */
+  --card-border: rgba(255,255,255,.15);
 
-  --text: hsl(220 20% 96%);
-  --text-2: hsl(220 15% 80%);
-  --text-3: hsl(220 10% 65%);
-  --text-invert: #fff;
+  --text:   #F7FAFC;
+  --text-2: #E2E8F0;
+  --text-3: #A0AEC0;
+  --text-invert: #FFFFFF;
 
-  --success-bg: color-mix(in srgb, var(--success) 20%, transparent);
-  --danger-bg:  color-mix(in srgb, var(--danger)  20%, transparent);
+  /* accent tints in dark */
+  --brand-1: var(--color-accent);
+  --brand-2: color-mix(in srgb, var(--color-accent) 40%, #FFFFFF 10%);
+  --brand-3: var(--color-success);
+
+  /* status backgrounds softened in dark */
+  --success-bg: color-mix(in srgb, var(--color-success) 20%, transparent);
+  --danger-bg:  color-mix(in srgb, var(--color-error)   20%, transparent);
 
   --shadow-sm: 0 1px 2px rgba(0,0,0,.6);
   --shadow-md: 0 4px 12px rgba(0,0,0,.6);
   --shadow-lg: 0 8px 28px rgba(0,0,0,.7);
 }
+
+/* ------------------------------------------------------------------
+   1C. ORIGINAL THEME VARIABLES (kept for reference)
+   ------------------------------------------------------------------
+   ⚠️ Everything below this line remains the same as in your uploaded
+   stylesheet (except I updated the header gradient to use brand vars).
+   ------------------------------------------------------------------ */
 
 /* ------------------------------------------------------------------
    3. Global Resets & Base

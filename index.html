@@ -11,11 +11,11 @@
     <header>
       <h1>💰 My Budget Tracker</h1>
       <div class="header-actions">
-        <!-- — NEW FEATURE: theme switch — -->
         <button id="themeToggle" aria-label="Toggle dark mode">🌙</button>
-        <!-- — NEW FEATURE: data tools — -->
         <button id="exportBtn">Export CSV</button>
         <button id="importBtn">Import CSV</button>
+        <!-- — BUDGET FEATURE — -->
+        <button id="budgetBtn">Set Budgets</button>
         <input id="importFile" type="file" accept=".csv" hidden />
       </div>
       <p>Log income &amp; expenses — your data stays in localStorage.</p>
@@ -77,6 +77,18 @@
       <ul id="entries"></ul>
     </section>
   </div>
+
+  <!-- — BUDGET FEATURE — Budget dialog -->
+  <dialog id="budgetDlg">
+    <form id="budgetForm" method="dialog">
+      <h2>Monthly Budgets</h2>
+      <div id="budgetFields"></div>
+      <footer>
+        <button type="submit">Save</button>
+        <button type="button" id="budgetCancel">Cancel</button>
+      </footer>
+    </form>
+  </dialog>
 
   <!-- libs -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

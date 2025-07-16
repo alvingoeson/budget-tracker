@@ -6,6 +6,7 @@ const typeInput    = document.getElementById('typeInput');
 const categoryInput= document.getElementById('categoryInput');
 const filterInput  = document.getElementById('filterInput');
 
+
 const descError   = document.getElementById('descError');
 const amountError = document.getElementById('amountError');
 
@@ -13,10 +14,24 @@ const summaryEl = document.getElementById('summary');
 const entriesEl = document.getElementById('entries');
 const ctx       = document.getElementById('balanceChart').getContext('2d');
 
+const exportBtn  = document.getElementById('exportBtn');   // — NEW
+const importBtn  = document.getElementById('importBtn');   // — NEW
+const importFile = document.getElementById('importFile');  // — NEW
+const themeToggle= document.getElementById('themeToggle'); // — NEW
+
+const budgetBtn   = document.getElementById('budgetBtn');
+const budgetDlg   = document.getElementById('budgetDlg');
+const budgetForm  = document.getElementById('budgetForm');
+const budgetFields= document.getElementById('budgetFields');
+const budgetCancel= document.getElementById('budgetCancel');
+
 // ─── Storage & State
 const STORAGE_KEY = 'budget-entries';
-const THEME_KEY   = 'budget-theme'; // — NEW
+const BUDGET_KEY  = 'budget-limits';
+const THEME_KEY   = 'budget-theme';
+
 let entries = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+let budgets = JSON.parse(localStorage.getItem(BUDGET_KEY))  || {};
 
 // ─── Theme helpers — NEW FEATURE
 function applyTheme(){
@@ -74,6 +89,79 @@ function importCSVFile(file){
     error:(err)=>alert('Import failed: '+err.message)
   });
 }
+
+// ─── Budget helpers — NEW FEATURE
+function openBudgetDialog(){
+  // build list of categories (unique, sorted)
+  const cats = [...new Set(entries.map(e=>e.category))].sort();
+  // build HTML fields
+  budgetFields.innerHTML = cats.map(cat=>{
+    const val = budgets[cat] ?? '';
+    return `<label>${cat}<input type="number" min="0" step="0.01" name="${cat}" value="${val}" /></label>`;
+  }).join('') || '<p>No categories yet. Add an entry first.</p>';
+  budgetDlg.showModal();
+}
+budgetBtn.addEventListener('click', openBudgetDialog);
+budgetCancel.addEventListener('click', ()=>budgetDlg.close());
+
+budgetForm.addEventListener('submit', e=>{
+  e.preventDefault();
+  const data = new FormData(budgetForm);
+  // update budgets object
+  budgets = {};
+  data.forEach((val,key)=>{
+    const num = Number(val);
+    if(num>0) budgets[key]=num;
+  });
+  localStorage.setItem(BUDGET_KEY, JSON.stringify(budgets));
+  budgetDlg.close();
+  renderBudgets();          // refresh summary
+});
+
+// calculate spend per category this month
+function calcSpendByCat(){
+  const spends={};
+  entries.forEach(e=>{
+    const cat=e.category;
+    // expenses add, income subtract: we want "amount spent"
+    const delta = (e.type==='expense') ? e.amount : -e.amount;
+    spends[cat]=(spends[cat]||0)+delta;
+  });
+  return spends;
+}
+
+// render nice progress bars inside #summary
+function renderBudgets(){
+  const summary = document.getElementById('summary');
+  summary.innerHTML=''; // clear
+  const spends = calcSpendByCat();
+
+  Object.keys(budgets).forEach(cat=>{
+    const limit = budgets[cat];
+    const spent = Math.max(spends[cat]||0,0);
+    const pct   = Math.min(100, Math.round(spent/limit*100));
+
+    const row = document.createElement('div');
+    row.className='budget-row';
+
+    row.innerHTML = `
+      <span>${cat}</span>
+      <span>${spent.toLocaleString()}/${limit.toLocaleString()}</span>
+      <div class="bar"><div style="width:${pct}%"></div></div>
+    `;
+    // bar colour flips at 100%
+    if(pct>=100) row.querySelector('.bar div').style.background='var(--expense)';
+    else         row.querySelector('.bar div').style.background='var(--income)';
+
+    summary.appendChild(row);
+  });
+
+  // Fallback when no budgets
+  if(!summary.childElementCount){
+    summary.innerHTML='<p style="color:var(--sub);font-size:.9rem">Set monthly budgets to track progress.</p>';
+  }
+}
+
 
 // ─── Categories
 const cats = {
@@ -186,6 +274,7 @@ function renderAll() {
   renderSummary();
   renderEntries();
   renderChart();
+  renderBudgets();
 }
 
 // ─── Validation

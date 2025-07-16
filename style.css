@@ -164,3 +164,34 @@ button[type=submit]:active{transform:scale(.97)}
 .entry button{background:none;border:0;font-size:1.1rem;color:#999;cursor:pointer}
 .entry button:hover{color:var(--text)}
 
+/* — BUDGET FEATURE — simple bar & dialog tweaks */
+.budget-row{
+  display:flex;align-items:center;gap:.6rem;margin:.4rem 0;font-size:.85rem
+}
+.budget-row span{white-space:nowrap}
+.budget-row .bar{
+  flex:1;height:6px;background:var(--card);border-radius:3px;overflow:hidden;
+}
+.budget-row .bar div{
+  height:100%;background:var(--expense);transition:width .35s;
+}
+body.dark-mode .budget-row .bar{background:#293043;}
+
+dialog#budgetDlg{
+  border:none;border-radius:8px;padding:1.4rem 1.6rem;
+  box-shadow:var(--shadow);max-width:320px;background:var(--card);color:var(--text);
+}
+dialog h2{margin-bottom:1rem;font-size:1.3rem}
+#budgetFields{display:flex;flex-direction:column;gap:.75rem;max-height:50vh;overflow:auto}
+#budgetFields label{display:flex;justify-content:space-between;gap:.6rem;font-size:.9rem}
+#budgetFields input{
+  width:100px;text-align:right;padding:.35rem .4rem;
+  border:1px solid var(--sub);border-radius:4px;background:transparent;color:var(--text);
+}
+dialog footer{display:flex;justify-content:flex-end;gap:.6rem;margin-top:1.2rem}
+dialog button{
+  padding:.45rem .9rem;border:1px solid var(--sub);border-radius:6px;cursor:pointer;
+  background:var(--card);color:var(--text);
+}
+dialog button[type="submit"]{background:var(--primary);color:#fff;border-color:var(--primary)}
+dialog::backdrop{background:rgba(0,0,0,.35)}

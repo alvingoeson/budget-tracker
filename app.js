@@ -1,63 +1,122 @@
-// ─── DOM refs
-const form         = document.getElementById('entryForm');
-const descInput    = document.getElementById('descInput');
-const amountInput  = document.getElementById('amountInput');
-const typeInput    = document.getElementById('typeInput');
-const categoryInput= document.getElementById('categoryInput');
-const filterInput  = document.getElementById('filterInput');
+/* ===================================================================
+   Budget Tracker App.js (modernized)
+   -------------------------------------------------------------------
+   Features: Theme toggle, CSV import/export, Category Budgets,
+   Recurring Transactions (daily/weekly/monthly), Chart theming.
+=================================================================== */
 
+/* ---------- DOM refs ---------- */
+const form          = document.getElementById('entryForm');
+const descInput     = document.getElementById('descInput');
+const amountInput   = document.getElementById('amountInput');
+const typeInput     = document.getElementById('typeInput');
+const categoryInput = document.getElementById('categoryInput');
+const filterInput   = document.getElementById('filterInput');
 
-const descError   = document.getElementById('descError');
-const amountError = document.getElementById('amountError');
+const descError     = document.getElementById('descError');
+const amountError   = document.getElementById('amountError');
 
-const summaryEl = document.getElementById('summary');
-const entriesEl = document.getElementById('entries');
-const ctx       = document.getElementById('balanceChart').getContext('2d');
+const summaryEl     = document.getElementById('summary');
+const entriesEl     = document.getElementById('entries');
+const ctx           = document.getElementById('balanceChart').getContext('2d');
 
-const exportBtn  = document.getElementById('exportBtn');   // — NEW
-const importBtn  = document.getElementById('importBtn');   // — NEW
-const importFile = document.getElementById('importFile');  // — NEW
-const themeToggle= document.getElementById('themeToggle'); // — NEW
+const exportBtn     = document.getElementById('exportBtn');
+const importBtn     = document.getElementById('importBtn');
+const importFile    = document.getElementById('importFile');
+const themeToggle   = document.getElementById('themeToggle');
 
-const budgetBtn   = document.getElementById('budgetBtn');
-const budgetDlg   = document.getElementById('budgetDlg');
-const budgetForm  = document.getElementById('budgetForm');
-const budgetFields= document.getElementById('budgetFields');
-const budgetCancel= document.getElementById('budgetCancel');
+const budgetBtn     = document.getElementById('budgetBtn');
+const budgetDlg     = document.getElementById('budgetDlg');
+const budgetForm    = document.getElementById('budgetForm');
+const budgetFields  = document.getElementById('budgetFields');
+const budgetCancel  = document.getElementById('budgetCancel');
 
-// ─── Storage & State
+const repeatInput   = document.getElementById('repeatInput');
+
+/* ---------- Storage keys ---------- */
 const STORAGE_KEY = 'budget-entries';
+const RECUR_KEY   = 'budget-recurring';
 const BUDGET_KEY  = 'budget-limits';
 const THEME_KEY   = 'budget-theme';
 
-let entries = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-let budgets = JSON.parse(localStorage.getItem(BUDGET_KEY))  || {};
+/* ---------- State ---------- */
+let entries   = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+let recurring = JSON.parse(localStorage.getItem(RECUR_KEY))   || [];
+let budgets   = JSON.parse(localStorage.getItem(BUDGET_KEY))  || {};
 
-// ─── Theme helpers — NEW FEATURE
+/* ---------- Utility ---------- */
+const fmt = n => '$' + Number(n).toFixed(2);
+
+/* CSS custom property reader */
+function cssVar(name){
+  return getComputedStyle(document.body).getPropertyValue(name).trim();
+}
+
+/* ---------- Theme ---------- */
 function applyTheme(){
   const mode = localStorage.getItem(THEME_KEY) || 'light';
-  document.body.classList.toggle('dark-mode', mode==='dark');
-  themeToggle.textContent = mode==='dark' ? '☀️' : '🌙';
+  document.body.classList.toggle('dark-mode', mode === 'dark');
+  themeToggle.textContent = mode === 'dark' ? '☀️' : '🌙';
+  // re-theme chart
+  renderChart();
 }
-themeToggle.addEventListener('click', () =>{
-  const next = document.body.classList.toggle('dark-mode') ? 'dark':'light';
-  localStorage.setItem(THEME_KEY,next);
-  themeToggle.textContent = next==='dark' ? '☀️' : '🌙';
+themeToggle.addEventListener('click', () => {
+  const next = document.body.classList.toggle('dark-mode') ? 'dark' : 'light';
+  localStorage.setItem(THEME_KEY, next);
+  themeToggle.textContent = next === 'dark' ? '☀️' : '🌙';
+  renderChart(); // update colors
 });
 
-// ─── CSV helpers — NEW FEATURE
+/* ---------- Recurring engine ---------- */
+function nextDate(dateStr, freq){
+  const d = new Date(dateStr);
+  if (freq === 'daily')   d.setDate(d.getDate() + 1);
+  if (freq === 'weekly')  d.setDate(d.getDate() + 7);
+  if (freq === 'monthly') d.setMonth(d.getMonth() + 1);
+  return d.toISOString();
+}
+
+function materialiseRecurring(){
+  const today = new Date().toISOString();
+  let changed = false;
+
+  recurring.forEach(r => {
+    while (r.nextDue <= today){
+      entries.push({
+        id: Date.now() + Math.random(),
+        date: r.nextDue,
+        desc: r.desc,
+        amount: r.amount,
+        type: r.type,
+        category: r.category,
+        _recurring: true
+      });
+      r.nextDue = nextDate(r.nextDue, r.freq);
+      changed = true;
+    }
+  });
+
+  if (changed) saveAll();
+}
+
+/* ---------- Save helpers ---------- */
+function saveAll(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+  localStorage.setItem(RECUR_KEY,   JSON.stringify(recurring));
+  localStorage.setItem(BUDGET_KEY,  JSON.stringify(budgets));
+}
+
+/* ---------- CSV import/export ---------- */
 function entriesToCSV(){
   const header = ['id','date','desc','amount','type','category'];
-  const rows   = entries.map(e=>[
-    e.id,e.date,e.desc,e.amount,e.type,e.category
-  ]);
-  return Papa.unparse([header,...rows]); // uses PapaParse
+  const rows   = entries.map(e => [e.id, e.date, e.desc, e.amount, e.type, e.category]);
+  return Papa.unparse([header, ...rows]); // spread rows
 }
 function downloadCSV(){
-  const csv = entriesToCSV();
+  const csv  = entriesToCSV();
   const blob = new Blob([csv],{type:'text/csv'});
   const url  = URL.createObjectURL(blob);
-  const a = document.createElement('a');
+  const a    = document.createElement('a');
   a.href = url;
   a.download = `budget-${new Date().toISOString().slice(0,10)}.csv`;
   document.body.appendChild(a);
@@ -70,31 +129,34 @@ function importCSVFile(file){
     header:true,
     skipEmptyLines:true,
     complete:({data})=>{
-      // Convert rows → entries; basic validation
       const imported = data
-        .filter(r=>r.amount && !isNaN(Number(r.amount)))
-        .map(r=>({
-          id: Number(r.id)||Date.now()+Math.random(),
+        .filter(r => r.amount && !isNaN(Number(r.amount)))
+        .map(r => ({
+          id: Number(r.id) || Date.now()+Math.random(),
           date: r.date || new Date().toISOString(),
           desc: r.desc || '',
           amount: Number(r.amount),
-          type: (r.type==='income')?'income':'expense',
+          type: (r.type === 'income') ? 'income' : 'expense',
           category: r.category || 'Other'
         }));
-      entries = [...entries, ...imported];
-      save();
+      entries = entries.concat(imported);
+      saveAll();
       renderAll();
       alert(`Imported ${imported.length} rows ✔`);
     },
     error:(err)=>alert('Import failed: '+err.message)
   });
 }
+exportBtn.addEventListener('click', downloadCSV);
+importBtn.addEventListener('click', () => importFile.click());
+importFile.addEventListener('change', e => {
+  if(e.target.files.length) importCSVFile(e.target.files[0]);
+  importFile.value = ''; // reset
+});
 
-// ─── Budget helpers — NEW FEATURE
+/* ---------- Budgets ---------- */
 function openBudgetDialog(){
-  // build list of categories (unique, sorted)
   const cats = [...new Set(entries.map(e=>e.category))].sort();
-  // build HTML fields
   budgetFields.innerHTML = cats.map(cat=>{
     const val = budgets[cat] ?? '';
     return `<label>${cat}<input type="number" min="0" step="0.01" name="${cat}" value="${val}" /></label>`;
@@ -102,79 +164,71 @@ function openBudgetDialog(){
   budgetDlg.showModal();
 }
 budgetBtn.addEventListener('click', openBudgetDialog);
-budgetCancel.addEventListener('click', ()=>budgetDlg.close());
+budgetCancel.addEventListener('click', () => budgetDlg.close());
 
 budgetForm.addEventListener('submit', e=>{
   e.preventDefault();
   const data = new FormData(budgetForm);
-  // update budgets object
   budgets = {};
   data.forEach((val,key)=>{
     const num = Number(val);
-    if(num>0) budgets[key]=num;
+    if(num>0) budgets[key] = num;
   });
-  localStorage.setItem(BUDGET_KEY, JSON.stringify(budgets));
+  saveAll();
   budgetDlg.close();
-  renderBudgets();          // refresh summary
+  renderBudgets();
 });
 
-// calculate spend per category this month
 function calcSpendByCat(){
-  const spends={};
+  const spends = {};
   entries.forEach(e=>{
-    const cat=e.category;
-    // expenses add, income subtract: we want "amount spent"
-    const delta = (e.type==='expense') ? e.amount : -e.amount;
-    spends[cat]=(spends[cat]||0)+delta;
+    const cat = e.category;
+    const delta = (e.type === 'expense') ? e.amount : -e.amount;
+    spends[cat] = (spends[cat]||0) + delta;
   });
   return spends;
 }
 
-// render nice progress bars inside #summary
 function renderBudgets(){
-  const summary = document.getElementById('summary');
-  summary.innerHTML=''; // clear
-  const spends = calcSpendByCat();
+  let host = document.getElementById('budgetBars');
+  if(!host){
+    host = document.createElement('div');
+    host.id = 'budgetBars';
+    summaryEl.appendChild(host);
+  }
+  host.innerHTML = '';
 
+  const spends = calcSpendByCat();
   Object.keys(budgets).forEach(cat=>{
     const limit = budgets[cat];
     const spent = Math.max(spends[cat]||0,0);
-    const pct   = Math.min(100, Math.round(spent/limit*100));
+    const pct   = Math.round((spent/limit)*100);
+    const clamped = Math.min(100,pct);
 
     const row = document.createElement('div');
-    row.className='budget-row';
-
+    row.className = 'budget-row';
     row.innerHTML = `
       <span>${cat}</span>
       <span>${spent.toLocaleString()}/${limit.toLocaleString()}</span>
-      <div class="bar"><div style="width:${pct}%"></div></div>
+      <div class="bar"><div style="width:${clamped}%"></div></div>
     `;
-    // bar colour flips at 100%
-    if(pct>=100) row.querySelector('.bar div').style.background='var(--expense)';
-    else         row.querySelector('.bar div').style.background='var(--income)';
-
-    summary.appendChild(row);
+    row.querySelector('.bar div').style.background =
+      pct >= 100 ? 'var(--expense)' : 'var(--income)';
+    host.appendChild(row);
   });
 
-  // Fallback when no budgets
-  if(!summary.childElementCount){
-    summary.innerHTML='<p style="color:var(--sub);font-size:.9rem">Set monthly budgets to track progress.</p>';
+  if(!host.childElementCount){
+    host.innerHTML = '<p style="color:var(--sub);font-size:.9rem">Set monthly budgets to track progress.</p>';
   }
 }
 
-
-// ─── Categories
+/* ---------- Category lists (static seeds) ---------- */
 const cats = {
   income : ['Salary','Freelance','Investment','Gift','Interest','Other'],
-  expense: ['Food','Rent','Utilities','Transportation','Entertainment',
-            'Health','Education','Subscriptions','Shopping','Other']
+  expense: ['Food','Rent','Utilities','Transportation','Entertainment','Health','Education','Subscriptions','Shopping','Other']
 };
 
-// ─── Helpers
-const save = () => localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-const fmt  = n  => '$' + n.toFixed(2);
-
-// ─── Populate Type → Category & Filter
+/* ---------- Populate category + filter ---------- */
 function fillCats() {
   const list = cats[typeInput.value] || [];
 
@@ -187,17 +241,17 @@ function fillCats() {
       `<option value="" disabled selected hidden>Choose type first…</option>`;
   }
 
-  // ✓ Reset so placeholder shows (gray) until a real option is picked
   categoryInput.value = "";
   categoryInput.selectedIndex = 0;
 
-  // Rebuild filter
   filterInput.innerHTML =
     '<option value="all">All</option>' +
     list.map(c => `<option value="${c}">${c}</option>`).join('');
 }
+typeInput.addEventListener('change', fillCats);
+filterInput.addEventListener('change', renderEntries);
 
-// ─── Render Summary
+/* ---------- Summary cards ---------- */
 function renderSummary() {
   const inc = entries.filter(e => e.type==='income').reduce((s,e)=>s+e.amount,0);
   const exp = entries.filter(e => e.type==='expense').reduce((s,e)=>s+e.amount,0);
@@ -209,7 +263,7 @@ function renderSummary() {
   `;
 }
 
-// ─── Render Entries
+/* ---------- Entries list ---------- */
 function renderEntries() {
   entriesEl.innerHTML = '';
   const filter = filterInput.value;
@@ -221,7 +275,7 @@ function renderEntries() {
       const d = new Date(entry.date);
       const monthKey = `${d.getFullYear()}-${d.getMonth()+1}`;
 
-      if (monthKey!==lastMonth) {
+      if (monthKey !== lastMonth) {
         const header = document.createElement('li');
         header.className = 'month-header';
         header.textContent = d.toLocaleDateString(undefined,{year:'numeric',month:'long'});
@@ -236,11 +290,12 @@ function renderEntries() {
         <span class="entry-category">${entry.category}</span>
         <span class="entry-desc">${entry.desc}</span>
         <span class="entry-amt">${entry.type==='expense'?'-':'+'} ${fmt(entry.amount)}</span>
-        <button>&times;</button>
+        <button aria-label="Delete entry">&times;</button>
       `;
       li.querySelector('button').onclick = () => {
-        entries = entries.filter(e => e.id!==entry.id);
-        save();
+        entries = entries.filter(e => e.id !== entry.id);
+        // NOTE: not auto-removing recurring template here; separate mgmt UI later
+        saveAll();
         renderAll();
       };
       entriesEl.appendChild(li);
@@ -249,27 +304,41 @@ function renderEntries() {
     }, '');
 }
 
-// ─── Render Donut Chart
+/* ---------- Chart ---------- */
 let balanceChart;
 function renderChart() {
+  // guard if canvas missing
+  if(!ctx) return;
+
   const inc = entries.filter(e=>e.type==='income').reduce((s,e)=>s+e.amount,0);
   const exp = entries.filter(e=>e.type==='expense').reduce((s,e)=>s+e.amount,0);
+
+  const incomeClr  = cssVar('--income')   || '#28a745';
+  const expenseClr = cssVar('--expense')  || '#e63946';
 
   if (balanceChart) balanceChart.destroy();
   balanceChart = new Chart(ctx,{
     type:'doughnut',
     data:{
       labels:['Income','Expenses'],
-      datasets:[{data:[inc,exp],backgroundColor:['#28a745','#e63946']}]},
+      datasets:[{
+        data:[inc,exp],
+        backgroundColor:[incomeClr,expenseClr],
+        borderWidth:0
+      }]
+    },
     options:{
       responsive:true,
-      cutout:'50%',
-      plugins:{legend:{position:'bottom'}}
+      maintainAspectRatio:false,
+      cutout:'55%',
+      plugins:{
+        legend:{position:'bottom',labels:{usePointStyle:true}}
+      }
     }
   });
 }
 
-// ─── Full Render
+/* ---------- Master render ---------- */
 function renderAll() {
   renderSummary();
   renderEntries();
@@ -277,52 +346,72 @@ function renderAll() {
   renderBudgets();
 }
 
-// ─── Validation
+/* ---------- Validation ---------- */
 function fieldsAreValid(){
   let valid = true;
-  if (!descInput.value.trim()) { descError.hidden = false; valid = false; }
-  else { descError.hidden = true; }
+
+  if (!descInput.value.trim()){
+    descError.hidden = false;
+    valid = false;
+  } else {
+    descError.hidden = true;
+  }
+
   const val = Number(amountInput.value);
-  if (isNaN(val)||val<=0) { amountError.hidden = false; valid = false; }
-  else { amountError.hidden = true; }
+  if (isNaN(val) || val <= 0){
+    amountError.hidden = false;
+    valid = false;
+  } else {
+    amountError.hidden = true;
+  }
+
+  if (!typeInput.value) valid = false;
+  if (!categoryInput.value) valid = false;
+
   return valid;
 }
 
-// ─── Listeners
-typeInput.addEventListener('change', fillCats);
-filterInput.addEventListener('change', renderEntries);
-
+/* ---------- Form submit ---------- */
 form.addEventListener('submit', e => {
   e.preventDefault();
   if (!fieldsAreValid()) return;
 
-  entries.push({
+  const baseEntry = {
     id: Date.now(),
     date: new Date().toISOString(),
     desc: descInput.value.trim(),
     amount: Number(amountInput.value),
     type: typeInput.value,
     category: categoryInput.value
-  });
+  };
 
-  save();
+  const freq = repeatInput.value;
+  if (freq === 'none'){
+    entries.push(baseEntry);
+  } else {
+    entries.push(baseEntry);
+    recurring.push({
+      id: baseEntry.id,   // link template id to first occurrence
+      desc: baseEntry.desc,
+      amount: baseEntry.amount,
+      type: baseEntry.type,
+      category: baseEntry.category,
+      freq,
+      nextDue: nextDate(baseEntry.date, freq)
+    });
+  }
+
+  saveAll();
   renderAll();
 
-  // Reset & restore placeholders
   form.reset();
-  fillCats();
+  repeatInput.value = 'none';
+  fillCats(); // resets category placeholder
   descInput.focus();
 });
 
-// Add new listeners
-exportBtn.addEventListener('click', downloadCSV);
-importBtn.addEventListener('click', ()=>importFile.click());
-importFile.addEventListener('change', e=>{
-  if(e.target.files.length) importCSVFile(e.target.files[0]);
-  importFile.value=''; // reset
-});
-
-// ─── Init
+/* ---------- Init ---------- */
 applyTheme();
+materialiseRecurring();   // must run before first render so missed items appear
 fillCats();
 renderAll();

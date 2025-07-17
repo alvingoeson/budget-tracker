@@ -232,107 +232,129 @@ const cats = {
 function fillCats() {
   const list = cats[typeInput.value] || [];
 
+  // Populate categoryInput (for entry form) as before
   if (list.length) {
     categoryInput.innerHTML =
-      `<option value="" disabled selected hidden>Category</option>` +
+      `<option value="" disabled selected hidden> </option>` +
       list.map(c => `<option value="${c}">${c}</option>`).join('');
   } else {
     categoryInput.innerHTML =
-      `<option value="" disabled selected hidden>Choose type first…</option>`;
+      `<option value="" disabled selected hidden> </option>`;
   }
-
   categoryInput.value = "";
   categoryInput.selectedIndex = 0;
 
+  // Populate filterInput with all unique categories from entries
+  const allCats = [...new Set(entries.map(e => e.category))].sort();
   filterInput.innerHTML =
     '<option value="all">All</option>' +
-    list.map(c => `<option value="${c}">${c}</option>`).join('');
+    allCats.map(c => `<option value="${c}">${c}</option>`).join('');
 }
 typeInput.addEventListener('change', fillCats);
 filterInput.addEventListener('change', renderEntries);
 
 /* ---------- Summary cards ---------- */
-function renderSummary() {
-  const inc = entries.filter(e => e.type==='income').reduce((s,e)=>s+e.amount,0);
-  const exp = entries.filter(e => e.type==='expense').reduce((s,e)=>s+e.amount,0);
+function renderSummary(filteredEntries = entries) {
+  const inc = filteredEntries.filter(e => e.type === 'income').reduce((s, e) => s + e.amount, 0);
+  const exp = filteredEntries.filter(e => e.type === 'expense').reduce((s, e) => s + e.amount, 0);
 
   summaryEl.innerHTML = `
     <div class="sum-card income">Income: <span>${fmt(inc)}</span></div>
     <div class="sum-card expense">Expenses: <span>${fmt(exp)}</span></div>
-    <div class="sum-card balance">Balance: <span>${fmt(inc-exp)}</span></div>
+    <div class="sum-card balance">Balance: <span>${fmt(inc - exp)}</span></div>
   `;
 }
+
 
 /* ---------- Entries list ---------- */
 function renderEntries() {
   entriesEl.innerHTML = '';
   const filter = filterInput.value;
 
-  entries
-    .filter(e => filter==='all' || e.category===filter)
-    .sort((a,b)=>new Date(b.date)-new Date(a.date))
-    .reduce((lastMonth, entry) => {
-      const d = new Date(entry.date);
-      const monthKey = `${d.getFullYear()}-${d.getMonth()+1}`;
+  // Filtered entries
+  const filtered = entries
+    .filter(e => filter === 'all' || e.category === filter)
+    .sort((a, b) => new Date(b.date) - new Date(a.date));
 
-      if (monthKey !== lastMonth) {
-        const header = document.createElement('li');
-        header.className = 'month-header';
-        header.textContent = d.toLocaleDateString(undefined,{year:'numeric',month:'long'});
-        entriesEl.appendChild(header);
-      }
+  // Render filtered entries
+  filtered.reduce((lastMonth, entry) => {
+    const d = new Date(entry.date);
+    const monthKey = `${d.getFullYear()}-${d.getMonth() + 1}`;
 
-      const li = document.createElement('li');
-      li.className = `entry ${entry.type}`;
-      const dateLabel = d.toLocaleDateString(undefined,{day:'2-digit',month:'short',year:'numeric'});
-      li.innerHTML = `
-        <span class="entry-date">${dateLabel}</span>
-        <span class="entry-category">${entry.category}</span>
-        <span class="entry-desc">${entry.desc}</span>
-        <span class="entry-amt">${entry.type==='expense'?'-':'+'} ${fmt(entry.amount)}</span>
-        <button aria-label="Delete entry">&times;</button>
-      `;
-      li.querySelector('button').onclick = () => {
-        entries = entries.filter(e => e.id !== entry.id);
-        // NOTE: not auto-removing recurring template here; separate mgmt UI later
-        saveAll();
-        renderAll();
-      };
-      entriesEl.appendChild(li);
+    if (monthKey !== lastMonth) {
+      const header = document.createElement('li');
+      header.className = 'month-header';
+      header.textContent = d.toLocaleDateString(undefined, { year: 'numeric', month: 'long' });
+      entriesEl.appendChild(header);
+    }
 
-      return monthKey;
-    }, '');
+    const li = document.createElement('li');
+    li.className = `entry ${entry.type}`;
+    const dateLabel = d.toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' });
+    li.innerHTML = `
+      <span class="entry-date">${dateLabel}</span>
+      <span class="entry-category">${entry.category}</span>
+      <span class="entry-desc">${entry.desc}</span>
+      <span class="entry-amt">${entry.type === 'expense' ? '-' : '+'} ${fmt(entry.amount)}</span>
+      <button aria-label="Delete entry">&times;</button>
+    `;
+    li.querySelector('button').onclick = () => {
+      entries = entries.filter(e => e.id !== entry.id);
+      saveAll();
+      renderAll();
+    };
+    entriesEl.appendChild(li);
+
+    return monthKey;
+  }, '');
+
+  // Only update the chart with filtered entries
+  renderChart(filtered);
 }
 
 /* ---------- Chart ---------- */
 let balanceChart;
-function renderChart() {
+function renderChart(filteredEntries = entries) {
   // guard if canvas missing
   if(!ctx) return;
 
-  const inc = entries.filter(e=>e.type==='income').reduce((s,e)=>s+e.amount,0);
-  const exp = entries.filter(e=>e.type==='expense').reduce((s,e)=>s+e.amount,0);
+  const inc = filteredEntries.filter(e=>e.type==='income').reduce((s,e)=>s+e.amount,0);
+  const exp = filteredEntries.filter(e=>e.type==='expense').reduce((s,e)=>s+e.amount,0);
 
-  const incomeClr  = cssVar('--income')   || '#28a745';
-  const expenseClr = cssVar('--expense')  || '#e63946';
+  // Create gradients matching summary cards
+  const incomeGradient = ctx.createLinearGradient(0, 0, 0, 400);
+  incomeGradient.addColorStop(0, "#43e97b"); // green
+  incomeGradient.addColorStop(1, "#38f9d7"); // teal
+
+  const expenseGradient = ctx.createLinearGradient(0, 0, 0, 400);
+  expenseGradient.addColorStop(0, "#ff5858"); // red
+  expenseGradient.addColorStop(1, "#f09819"); // orange
 
   if (balanceChart) balanceChart.destroy();
-  balanceChart = new Chart(ctx,{
-    type:'doughnut',
-    data:{
-      labels:['Income','Expenses'],
-      datasets:[{
-        data:[inc,exp],
-        backgroundColor:[incomeClr,expenseClr],
-        borderWidth:0
+  balanceChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Income', 'Expenses'],
+      datasets: [{
+        data: [inc, exp],
+        backgroundColor: [incomeGradient, expenseGradient],
+        borderWidth: 0
       }]
     },
-    options:{
-      responsive:true,
-      maintainAspectRatio:false,
-      cutout:'55%',
-      plugins:{
-        legend:{position:'bottom',labels:{usePointStyle:true}}
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '55%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            usePointStyle: true,
+            color: "#fff",
+            font: { weight: 600 },
+            padding: 28
+          }
+        }
       }
     }
   });
@@ -340,9 +362,9 @@ function renderChart() {
 
 /* ---------- Master render ---------- */
 function renderAll() {
-  renderSummary();
-  renderEntries();
-  renderChart();
+  renderSummary();    // always show summary for all entries
+  renderEntries();    // entries and chart will reflect filter
+  renderChart();      // (optional, since renderEntries calls renderChart)
   renderBudgets();
 }
 

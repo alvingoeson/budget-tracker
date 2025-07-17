@@ -10,36 +10,49 @@
 <body>
   <div class="container">
     <header>
-      <h1>💰 My Budget Tracker</h1>
-      <div class="header-actions">
+  <span class="logo">
+  <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+    <defs>
+      <linearGradient id="incomeExpenseGrad" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#43e97b"/>
+        <stop offset="1" stop-color="#ff5858"/>
+      </linearGradient>
+    </defs>
+    <circle cx="24" cy="24" r="20" fill="url(#incomeExpenseGrad)" />
+    <rect x="14" y="18" width="20" height="12" rx="4" fill="#fff" fill-opacity="0.9"/>
+    <rect x="18" y="22" width="12" height="4" rx="2" fill="url(#incomeExpenseGrad)" />
+    <circle cx="24" cy="24" r="3" fill="#fff" fill-opacity="0.9"/>
+  </svg>
+</span>
+  <h1>Budget <span class="gradient-text">Tracker</span></h1>
+  <p>Log income &amp; expenses — your data stays in localStorage.</p>
+  <div class="header-actions">
         <button id="themeToggle" aria-label="Toggle dark mode">🌙</button>
         <button id="exportBtn">Export CSV</button>
         <button id="importBtn">Import CSV</button>
-        <!-- — BUDGET FEATURE — -->
         <button id="budgetBtn">Set Budgets</button>
         <input id="importFile" type="file" accept=".csv" hidden />
       </div>
-      <p>Log income &amp; expenses — your data stays in localStorage.</p>
     </header>
 
     <!-- ── Floating-label form (vertical) ───────────────────── -->
     <section class="form-section">
       <form id="entryForm">
         <div class="field">
-          <input id="descInput" type="text" placeholder="What did you receive/spend on?" required />
+          <input id="descInput" type="text" placeholder="" required />
           <label for="descInput">Description</label>
           <small id="descError" class="error" hidden>Please enter a description.</small>
         </div>
 
         <div class="field">
-          <input id="amountInput" type="number" step="1" placeholder="How much?" required />
+          <input id="amountInput" type="number" step="1" placeholder="" required />
           <label for="amountInput">Amount</label>
           <small id="amountError" class="error" hidden>Please enter a positive number.</small>
         </div>
 
         <div class="field">
           <select id="typeInput" required>
-            <option value="" disabled selected hidden>Type</option>
+            <option value="" disabled selected hidden> </option>
             <option value="income">Income</option>
             <option value="expense">Expense</option>
           </select>
@@ -48,14 +61,14 @@
 
         <div class="field">
           <select id="categoryInput" required>
-            <option value="" disabled selected hidden>Choose type first…</option>
+            <option value="" disabled selected hidden> </option>
           </select>
           <label for="categoryInput">Category</label>
         </div>
 
         <div class="field">
           <select id="repeatInput" required>
-            <option value="" disabled selected hidden>Repeat</option>
+            <option value="" disabled selected hidden> </option>
             <option value="none">No repeat</option>
             <option value="monthly">Monthly</option>
             <option value="weekly">Weekly</option>

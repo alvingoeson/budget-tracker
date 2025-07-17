@@ -189,8 +189,7 @@ header h1, .gradient-text {
     0 2px 8px rgba(44, 62, 80, 0.18), /* subtle dark shadow for contrast */
     0 1px 0px #fff; /* crisp white edge for clarity */
   filter: none;
-  text-align: center;
-  display: inline-block;
+  display: inline-block;  
 }
 
 header p {
@@ -201,8 +200,6 @@ header p {
   margin-top: .5em;
   text-shadow: 0 2px 8px rgba(49,130,206,0.08);
   text-align: center;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .header-actions {
@@ -660,125 +657,6 @@ button[type=submit]:active{transform:scale(.97);}
 /* ------------------------------------------------------------------
    11. Budget Dialog
    ------------------------------------------------------------------ */
-/* Hide while closed to avoid flash */
-#budgetDlg:not([open]){display:none;}
-
-/* We let the UA backdrop show; we override position */
-#budgetDlg{
-  position:fixed;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  margin:0;
-  padding:0;
-  border:none;
-  background:transparent;
-  z-index:1000;
-  color:var(--text);
-}
-
-/* Backdrop dim */
-#budgetDlg::backdrop{
-  background:rgba(0,0,0,.35);
-  backdrop-filter:blur(2px);
-}
-
-/* Modal card */
-#budgetDlg .budget-card{
-  display:flex;
-  flex-direction:column;
-  gap:var(--sp-4);
-  width:min(90vw,420px);
-  max-height:80dvh;
-  overflow-y:auto;
-  padding:var(--sp-6) var(--sp-5);
-  background:var(--card);
-  color:var(--text);
-  border-radius:var(--rad-lg);
-  box-shadow:0 8px 48px rgba(0,0,0,.25),0 2px 16px rgba(0,0,0,.15);
-  position:relative;
-  isolation:isolate;
-}
-
-/* Accent stripe */
-#budgetDlg .budget-card::before{
-  content:"";
-  position:absolute;
-  inset-inline:0;
-  top:0;
-  height:6px;
-  background:linear-gradient(90deg,var(--brand-1),var(--brand-2));
-  border-top-left-radius:inherit;
-  border-top-right-radius:inherit;
-}
-
-/* Title */
-#budgetDlg h2{
-  margin:0 0 var(--sp-2) 0;
-  font-size:var(--fs-lg);
-  font-family:'Rubik',sans-serif;
-  font-weight:600;
-  text-align:center;
-  color:var(--brand-1);
-}
-
-/* Fields */
-#budgetFields{
-  display:flex;
-  flex-direction:column;
-  gap:var(--sp-3);
-}
-#budgetFields label{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:var(--sp-2);
-  font-size:var(--fs-sm);
-  color:var(--text-2);
-}
-#budgetFields input{
-  width:110px;
-  text-align:right;
-  padding:.45rem .4rem;
-  font-size:var(--fs-sm);
-  border:1px solid var(--card-border);
-  border-radius:var(--rad-xs);
-  background:var(--card-alt);
-  color:var(--text);
-}
-
-/* Footer buttons */
-#budgetDlg footer.budget-actions{
-  margin-top:var(--sp-4);
-  display:flex;
-  justify-content:flex-end;
-  gap:var(--sp-2);
-}
-#budgetDlg footer.budget-actions .btn-primary,
-#budgetDlg footer.budget-actions .btn-ghost{
-  font-size:var(--fs-sm);
-  padding:.55em 1.4em;
-  border-radius:var(--rad-sm);
-  cursor:pointer;
-  transition:background var(--dur-fast),transform var(--dur-fast);
-}
-#budgetDlg footer.budget-actions .btn-primary{
-  background:linear-gradient(135deg,var(--brand-1) 0%,var(--brand-2) 100%);
-  color:var(--text-invert);
-  border:none;
-}
-#budgetDlg footer.budget-actions .btn-primary:hover{
-  transform:translateY(-2px) scale(1.02);
-  filter:brightness(1.05);
-}
-#budgetDlg footer.budget-actions .btn-ghost{
-  background:transparent;
-  color:var(--brand-1);
-  border:1px solid var(--brand-1);
-}
-#budgetDlg footer.budget-actions .btn-ghost:hover{
-  background:color-mix(in srgb,var(--brand-1) 12%,transparent);
-}
 
 /* ------------------------------------------------------------------
    12. Misc / Helpers
@@ -905,4 +783,188 @@ input[type="number"]::placeholder { color: var(--text-3); }
 /* For Firefox */
 input[type="number"] {
   -moz-appearance: textfield;
+}
+
+
+/* ==================================================================
+   SELECT ENHANCEMENT LAYER
+   ------------------------------------------------------------------
+   Improves readability & focus styling for all dropdowns
+   (Type, Category, Repeat, Filter) without altering existing look.
+   ------------------------------------------------------------------ */
+
+/* Shared custom arrow (light) */
+:root {
+  --_sel-arrow-light: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%233182CE' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+/* Dark-mode arrow */
+body.dark-mode {
+  --_sel-arrow-light: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23F7FAFC' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+/* Base select skinning */
+.field select,
+.filter-section select {
+  appearance:none;
+  -webkit-appearance:none;
+  -moz-appearance:none;
+  background-image: var(--_sel-arrow-light);
+  background-repeat:no-repeat;
+  background-position: right .9em center;
+  background-size: 12px 8px;
+  cursor:pointer;
+  line-height:1.3;
+}
+
+/* Stronger visual focus */
+.field select:focus,
+.filter-section select:focus {
+  outline:none;
+  border-color: var(--brand-1);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--brand-1) 40%, transparent);
+  transform:translateY(-1px);
+}
+
+/* Dropdown option styling (browser support varies; harmless where ignored) */
+.field select option,
+.filter-section select option {
+  font-size:var(--fs-md);
+  line-height:1.4;
+  padding:.4em .75em;
+  color:var(--color-text-high);
+  background:#FFF;
+}
+body.dark-mode .field select option,
+body.dark-mode .filter-section select option {
+  color:#F7FAFC;
+  background:#2D3748;
+}
+
+/* Dim disabled placeholders */
+.field select option[disabled],
+.filter-section select option[disabled] {
+  color:var(--text-3);
+}
+
+/* High-contrast hover/selected (where supported) */
+.field select option:checked,
+.filter-section select option:checked {
+  background:color-mix(in srgb,var(--brand-1) 25%, #FFFFFF);
+  color:var(--color-primary);
+}
+body.dark-mode .field select option:checked,
+body.dark-mode .filter-section select option:checked {
+  background:color-mix(in srgb,var(--brand-1) 35%, #2D3748);
+  color:#F7FAFC;
+}
+
+/* Remove default arrow in old Edge/IE (safe no-op elsewhere) */
+.field select::-ms-expand,
+.filter-section select::-ms-expand {
+  display:none;
+}
+
+/* Touch target boost on small screens */
+@media (max-width:600px){
+  .field select,
+  .filter-section select {
+    font-size:var(--fs-md);
+    padding-top:.8em;
+    padding-bottom:.8em;
+  }
+  .field select option,
+  .filter-section select option {
+    font-size:var(--fs-md);
+    padding:.65em .9em;
+  }
+}
+/* ===============================================================
+   FILTER SECTION ENHANCEMENTS FOR MULTI-FILTER UI
+   (Appended non-destructive overrides)
+   =============================================================== */
+
+/* Layout: wrap nicely; align items baseline */
+.filter-section {
+  row-gap: var(--sp-3);
+}
+
+/* Individual filter field blocks */
+.filter-field {
+  display:flex;
+  flex-direction:column;
+  gap:.25em;
+  min-width:max(110px,10ch);
+}
+
+.filter-field.filter-search {
+  min-width:160px;
+  flex:1 1 160px;
+}
+
+.filter-clear {
+  min-width:160px;
+  height: 30px;
+  flex:1 1 160px;
+  margin-top: 20px;
+}
+
+.filter-field.filter-range {
+  min-width:140px;
+}
+
+/* Labels */
+.filter-field > label {
+  font-size:var(--fs-xs);
+  font-weight:600;
+  color:var(--text-2);
+  margin:0;
+  line-height:1.2;
+}
+
+/* Inputs / selects */
+.filter-field > select,
+.filter-field > input[type="date"],
+.filter-field > input[type="text"] {
+  padding:.45em .9em;
+  font-size:var(--fs-sm);
+  border:1px solid var(--card-border);
+  border-radius:var(--rad-sm);
+  background:var(--card-alt);
+  color:var(--text);
+  line-height:1.2;
+  min-height:2.25em;
+  box-shadow:0 1px 4px rgba(49,130,206,.06);
+  transition:border-color var(--dur-fast),background var(--dur-fast),box-shadow var(--dur-fast);
+}
+
+.filter-field > input[type="text"]::placeholder {
+  color:var(--text-3);
+}
+
+/* Focus */
+.filter-field > select:focus,
+.filter-field > input[type="date"]:focus,
+.filter-field > input[type="text"]:focus {
+  outline:none;
+  border-color:var(--brand-1);
+  background:var(--card);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--brand-1) 40%, transparent);
+}
+
+/* Small ghost clear button re-uses btn-ghost + scale */
+.btn-small {
+  padding:.35em .9em;
+  font-size:var(--fs-xs);
+  line-height:1.2;
+}
+
+/* Responsive compression */
+@media (max-width:600px){
+  .filter-field {
+    flex:1 1 45%;
+    min-width:45%;
+  }
+  .filter-field.filter-search {
+    flex-basis:100%;
+  }
 }

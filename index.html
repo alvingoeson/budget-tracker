@@ -10,7 +10,7 @@
   <div class="container">
     <header>
       <span class="logo">
-        <!-- simplified inline logo (kept from your current version) -->
+        <!-- inline logo -->
         <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
           <defs>
             <linearGradient id="incomeExpenseGrad" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
@@ -30,7 +30,6 @@
         <button id="themeToggle" aria-label="Toggle dark mode">🌙</button>
         <button id="exportBtn">Export CSV</button>
         <button id="importBtn">Import CSV</button>
-        <button id="budgetBtn">Set Budgets</button>
         <input id="importFile" type="file" accept=".csv" hidden />
       </div>
     </header>
@@ -45,7 +44,7 @@
         </div>
 
         <div class="field">
-          <input id="amountInput" type="number" step="1" placeholder="" required />
+          <input id="amountInput" type="decimal" step="1" placeholder="" required />
           <label for="amountInput">Amount</label>
           <small id="amountError" class="error" hidden>Please enter a positive number.</small>
         </div>
@@ -81,20 +80,48 @@
       </form>
     </section>
 
-    <!-- Summary cards injected by JS -->
-    <section id="summary" class="summary-section"></section>
-
-    <!-- Filter -->
-    <section class="filter-section">
-      <label for="filterInput">Show:</label>
-      <select id="filterInput">
-        <option value="all">All</option>
-      </select>
-    </section>
-
     <!-- Donut chart -->
     <section class="chart-section">
       <canvas id="balanceChart" width="400" height="200"></canvas>
+    </section>
+
+    <!-- Summary cards injected by JS -->
+    <section id="summary" class="summary-section"></section>
+
+    <!-- Filters -->
+    <section class="filter-section">
+      <div class="filter-field">
+        <label for="filterType">Type</label>
+        <select id="filterType">
+          <option value="all">All</option>
+          <option value="income">Income</option>
+          <option value="expense">Expense</option>
+        </select>
+      </div>
+
+      <div class="filter-field">
+        <label for="filterInput">Category</label>
+        <select id="filterInput">
+          <option value="all">All</option>
+        </select>
+      </div>
+
+      <div class="filter-field filter-range">
+        <label for="filterFrom">From</label>
+        <input type="date" id="filterFrom" />
+      </div>
+
+      <div class="filter-field filter-range">
+        <label for="filterTo">To</label>
+        <input type="date" id="filterTo" />
+      </div>
+
+      <div class="filter-field filter-search">
+        <label for="filterSearch">Search</label>
+        <input type="text" id="filterSearch" placeholder="description…" />
+      </div>
+
+      <button type="button" id="filterClear" class="btn btn-ghost btn-small filter-clear">Clear</button>
     </section>
 
     <!-- Entries -->
@@ -102,18 +129,6 @@
       <ul id="entries"></ul>
     </section>
   </div>
-
-  <!-- Budget Dialog -->
-  <dialog id="budgetDlg">
-    <form id="budgetForm" class="budget-card" method="dialog">
-      <h2>Monthly Budgets</h2>
-      <div id="budgetFields"></div>
-      <footer class="budget-actions">
-        <button type="submit" class="btn-primary budget-save">Save</button>
-        <button type="button" id="budgetCancel" class="btn-ghost budget-cancel">Cancel</button>
-      </footer>
-    </form>
-  </dialog>
 
   <!-- libs -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

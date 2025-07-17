@@ -660,15 +660,125 @@ button[type=submit]:active{transform:scale(.97);}
 /* ------------------------------------------------------------------
    11. Budget Dialog
    ------------------------------------------------------------------ */
-#budgetDlg{border:none;border-radius:var(--rad-md);padding:var(--sp-6) var(--sp-5);box-shadow:var(--shadow-lg);max-width:340px;width:90%;background:var(--card);color:var(--text);}
-#budgetDlg h2{margin-bottom:var(--sp-4);font-size:var(--fs-lg);font-family:'Rubik',sans-serif;font-weight:600;}
-#budgetFields{display:flex;flex-direction:column;gap:var(--sp-3);max-height:50vh;overflow-y:auto;padding-right:.25rem;}
-#budgetFields label{display:flex;justify-content:space-between;align-items:center;gap:var(--sp-2);font-size:var(--fs-sm);}
-#budgetFields input{width:110px;text-align:right;padding:.45rem .4rem;font-size:var(--fs-sm);border:1px solid var(--card-border);border-radius:var(--rad-xs);background:var(--card-alt);color:var(--text);} 
-#budgetDlg footer{display:flex;justify-content:flex-end;gap:var(--sp-2);margin-top:var(--sp-5);} 
-#budgetDlg footer button{font-size:var(--fs-sm);} 
+/* Hide while closed to avoid flash */
+#budgetDlg:not([open]){display:none;}
 
-#budgetDlg::backdrop{background:rgba(0,0,0,.35);} 
+/* We let the UA backdrop show; we override position */
+#budgetDlg{
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  margin:0;
+  padding:0;
+  border:none;
+  background:transparent;
+  z-index:1000;
+  color:var(--text);
+}
+
+/* Backdrop dim */
+#budgetDlg::backdrop{
+  background:rgba(0,0,0,.35);
+  backdrop-filter:blur(2px);
+}
+
+/* Modal card */
+#budgetDlg .budget-card{
+  display:flex;
+  flex-direction:column;
+  gap:var(--sp-4);
+  width:min(90vw,420px);
+  max-height:80dvh;
+  overflow-y:auto;
+  padding:var(--sp-6) var(--sp-5);
+  background:var(--card);
+  color:var(--text);
+  border-radius:var(--rad-lg);
+  box-shadow:0 8px 48px rgba(0,0,0,.25),0 2px 16px rgba(0,0,0,.15);
+  position:relative;
+  isolation:isolate;
+}
+
+/* Accent stripe */
+#budgetDlg .budget-card::before{
+  content:"";
+  position:absolute;
+  inset-inline:0;
+  top:0;
+  height:6px;
+  background:linear-gradient(90deg,var(--brand-1),var(--brand-2));
+  border-top-left-radius:inherit;
+  border-top-right-radius:inherit;
+}
+
+/* Title */
+#budgetDlg h2{
+  margin:0 0 var(--sp-2) 0;
+  font-size:var(--fs-lg);
+  font-family:'Rubik',sans-serif;
+  font-weight:600;
+  text-align:center;
+  color:var(--brand-1);
+}
+
+/* Fields */
+#budgetFields{
+  display:flex;
+  flex-direction:column;
+  gap:var(--sp-3);
+}
+#budgetFields label{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:var(--sp-2);
+  font-size:var(--fs-sm);
+  color:var(--text-2);
+}
+#budgetFields input{
+  width:110px;
+  text-align:right;
+  padding:.45rem .4rem;
+  font-size:var(--fs-sm);
+  border:1px solid var(--card-border);
+  border-radius:var(--rad-xs);
+  background:var(--card-alt);
+  color:var(--text);
+}
+
+/* Footer buttons */
+#budgetDlg footer.budget-actions{
+  margin-top:var(--sp-4);
+  display:flex;
+  justify-content:flex-end;
+  gap:var(--sp-2);
+}
+#budgetDlg footer.budget-actions .btn-primary,
+#budgetDlg footer.budget-actions .btn-ghost{
+  font-size:var(--fs-sm);
+  padding:.55em 1.4em;
+  border-radius:var(--rad-sm);
+  cursor:pointer;
+  transition:background var(--dur-fast),transform var(--dur-fast);
+}
+#budgetDlg footer.budget-actions .btn-primary{
+  background:linear-gradient(135deg,var(--brand-1) 0%,var(--brand-2) 100%);
+  color:var(--text-invert);
+  border:none;
+}
+#budgetDlg footer.budget-actions .btn-primary:hover{
+  transform:translateY(-2px) scale(1.02);
+  filter:brightness(1.05);
+}
+#budgetDlg footer.budget-actions .btn-ghost{
+  background:transparent;
+  color:var(--brand-1);
+  border:1px solid var(--brand-1);
+}
+#budgetDlg footer.budget-actions .btn-ghost:hover{
+  background:color-mix(in srgb,var(--brand-1) 12%,transparent);
+}
 
 /* ------------------------------------------------------------------
    12. Misc / Helpers

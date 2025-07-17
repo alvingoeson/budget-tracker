@@ -155,6 +155,16 @@ importFile.addEventListener('change', e => {
 });
 
 /* ---------- Budgets ---------- */
+/* Force-center the dialog each time it opens (defensive). */
+function centerBudgetDialog(){
+  // inline styles outrank rogue CSS
+  budgetDlg.style.top = '50%';
+  budgetDlg.style.left = '50%';
+  budgetDlg.style.transform = 'translate(-50%,-50%)';
+  budgetDlg.style.position = 'fixed';
+  budgetDlg.style.margin = '0';
+}
+
 function openBudgetDialog(){
   const cats = [...new Set(entries.map(e=>e.category))].sort();
   budgetFields.innerHTML = cats.map(cat=>{
@@ -162,6 +172,8 @@ function openBudgetDialog(){
     return `<label>${cat}<input type="number" min="0" step="0.01" name="${cat}" value="${val}" /></label>`;
   }).join('') || '<p>No categories yet. Add an entry first.</p>';
   budgetDlg.showModal();
+  // Wait one frame so dialog has layout, then center
+  requestAnimationFrame(centerBudgetDialog);
 }
 budgetBtn.addEventListener('click', openBudgetDialog);
 budgetCancel.addEventListener('click', () => budgetDlg.close());

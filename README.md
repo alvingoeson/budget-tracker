@@ -9,7 +9,3 @@ Data is persisted in localStorage.
 2. `cd budget-tracker`
 3. Open with Live Server or double-click `index.html`
 
-## Next steps
-
-- Split code into `index.html` / `style.css` / `app.js`
-- Add categories, charts, testing, PWA…

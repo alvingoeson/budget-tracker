@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
+  <div class="container" style="background-image: https://vulcanpost.com/wp-content/uploads/2025/02/Singapore-dollar-Featured-Image-Credit_timothyroesdiahFreepik.jpg;">
     <header>
       <span class="logo">
         <!-- inline logo -->
@@ -88,6 +88,13 @@
     <!-- Summary cards injected by JS -->
     <section id="summary" class="summary-section"></section>
 
+    <!-- ===== Filters (collapsible wrapper) ===== -->
+    <div class="filter-container collapsed">
+      <button id="filterToggle" class="btn btn-ghost filter-toggle" aria-expanded="false">
+        ⚙️ Set Filters
+      </button>
+
+    
     <!-- Filters -->
     <section class="filter-section">
       <div class="filter-field">
@@ -118,7 +125,7 @@
 
       <div class="filter-field filter-search">
         <label for="filterSearch">Search</label>
-        <input type="text" id="filterSearch" placeholder="Description…" />
+        <input type="text" id="filterSearch" placeholder="description…" />
       </div>
 
       <button type="button" id="filterClear" class="btn btn-ghost btn-small filter-clear">Clear</button>

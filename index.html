@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container" style="background-image: https://vulcanpost.com/wp-content/uploads/2025/02/Singapore-dollar-Featured-Image-Credit_timothyroesdiahFreepik.jpg;">
+  <div class="container">
     <header>
       <span class="logo">
         <!-- inline logo -->
@@ -38,13 +38,13 @@
     <section class="form-section">
       <form id="entryForm">
         <div class="field">
-          <input id="descInput" type="text" placeholder="" required />
+          <input id="descInput" type="text" placeholder="Description" required />
           <label for="descInput">Description</label>
           <small id="descError" class="error" hidden>Please enter a description.</small>
         </div>
 
         <div class="field">
-          <input id="amountInput" type="decimal" step="1" placeholder="" required />
+          <input id="amountInput" type="decimal" step="1" placeholder="Amount" required />
           <label for="amountInput">Amount</label>
           <small id="amountError" class="error" hidden>Please enter a positive number.</small>
         </div>
@@ -125,7 +125,7 @@
 
       <div class="filter-field filter-search">
         <label for="filterSearch">Search</label>
-        <input type="text" id="filterSearch" placeholder="description…" />
+        <input type="text" id="filterSearch" placeholder="Description…" />
       </div>
 
       <button type="button" id="filterClear" class="btn btn-ghost btn-small filter-clear">Clear</button>

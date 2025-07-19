@@ -372,6 +372,14 @@ form{
   color: var(--text-3);
 }
 
+.field input::placeholder {
+  color: transparent;          /* nothing on load */
+  transition: color .15s ease;
+}
+.field input:focus::placeholder {
+  color: var(--text-3);        /* faint hint _while focused_ */
+}
+
 .field small.error{display:block;margin-top:var(--sp-1);font-size:var(--fs-xs);color:var(--danger);}/* error msg */
 .error[hidden]{display:none!important}
 
@@ -998,6 +1006,9 @@ body.dark-mode .filter-section select option:checked {
   background:var(--card-alt);
   color:var(--text);line-height:1.2;
   transition:border-color var(--dur-fast),background var(--dur-fast),box-shadow var(--dur-fast);
+}
+.filter-field>input[type="date"] {
+  width:95%
 }
 .filter-field>input::placeholder{ color:var(--text-3); }
 

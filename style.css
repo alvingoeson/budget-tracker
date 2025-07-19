@@ -780,10 +780,6 @@ input[type="number"]::-moz-placeholder { color: var(--text-3); }
 input[type="number"]:-ms-input-placeholder { color: var(--text-3); }
 input[type="number"]::placeholder { color: var(--text-3); }
 
-/* For Firefox */
-input[type="number"] {
-  -moz-appearance: textfield;
-}
 
 
 /* ==================================================================

@@ -1078,10 +1078,7 @@ body.dark-mode .filter-section select option:checked {
     margin-top:var(--sp-1);
   }
   
-  .field input,
-  .field select {
-    font-size: 16px !important;         
-  }
+  
 }
 
 .field input:focus + label,

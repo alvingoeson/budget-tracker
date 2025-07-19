@@ -1,10 +1,5 @@
 /* ==================================================================
    Budget Tracker — Modern Fintech Theme CSS
-   BRAND PALETTE INTEGRATION BUILD
-   ------------------------------------------------------------------
-   Only change set: inject user brand palette + legacy aliases so
-   existing JS picks up correct colors. Layout, floating labels,
-   and component styling left intact.
    ================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
@@ -38,7 +33,7 @@
   --info:    var(--color-accent);
 
   /* surfaces used throughout original theme */
-  --bg:       #FFFFFF;                /* main page bg (kept white; see below) */
+  --bg:       #FFFFFF;                
   --bg-alt:   var(--color-surface);
   --card:     #FFFFFF;
   --card-alt: var(--color-surface);
@@ -53,7 +48,7 @@
   /* chart aliases consumed by JS (cssVar('--income'), etc.) */
   --income:    var(--color-success);
   --expense:   var(--color-error);
-  --primary:   var(--color-accent); /* fallback mapping */
+  --primary:   var(--color-accent); 
   --chart-income:  var(--color-success);
   --chart-expense: var(--color-error);
   --chart-balance: var(--color-accent);
@@ -99,10 +94,10 @@
    1B. Dark Theme Overrides (brand-respecting)
    ------------------------------------------------------------------ */
 body.dark-mode {
-  --bg: #1A202C;          /* deep slate */
+  --bg: #1A202C;         
   --bg-alt: #2D3748;
   --card: #2D3748;
-  --card-alt: #374151;    /* slightly lighter than card */
+  --card-alt: #374151;    
   --card-border: rgba(255,255,255,.15);
 
   --text:   #F7FAFC;
@@ -124,15 +119,9 @@ body.dark-mode {
   --shadow-lg: 0 8px 28px rgba(0,0,0,.7);
 }
 
-/* ------------------------------------------------------------------
-   1C. ORIGINAL THEME VARIABLES (kept for reference)
-   ------------------------------------------------------------------
-   ⚠️ Everything below this line remains the same as in your uploaded
-   stylesheet (except I updated the header gradient to use brand vars).
-   ------------------------------------------------------------------ */
 
 /* ------------------------------------------------------------------
-   3. Global Resets & Base
+   2. Global Resets & Base
    ------------------------------------------------------------------ */
 *{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
@@ -151,16 +140,15 @@ img,svg,canvas{max-width:100%;display:block;}
 
 .container{max-width:min(90ch,100%);margin-inline:auto;padding:var(--sp-6) var(--sp-4);}
 
-/* screen reader only utility */
 .sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;}
 
 /* ------------------------------------------------------------------
-   4. Header
+   3. Header
    ------------------------------------------------------------------ */
 header {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center content horizontally */
+  align-items: center; 
   gap: var(--sp-2);
   margin-bottom: var(--sp-6);
   padding: var(--sp-6) var(--sp-5);
@@ -171,7 +159,7 @@ header {
   position: relative;
   overflow: hidden;
   isolation: isolate;
-  text-align: center; /* Center text */
+  text-align: center; 
 }
 
 header h1, .gradient-text {
@@ -186,8 +174,8 @@ header h1, .gradient-text {
   margin-bottom: var(--sp-1);
   letter-spacing: 0.01em;
   text-shadow:
-    0 2px 8px rgba(44, 62, 80, 0.18), /* subtle dark shadow for contrast */
-    0 1px 0px #fff; /* crisp white edge for clarity */
+    0 2px 8px rgba(44, 62, 80, 0.18), 
+    0 1px 0px #fff; 
   filter: none;
   display: inline-block;  
 }
@@ -243,7 +231,7 @@ header p {
     padding: var(--sp-5) var(--sp-2);
   }
   .header-actions {
-    flex-direction: row;    /* Change from column to row */
+    flex-direction: row;    
     gap: var(--sp-2);
     align-items: center;
     justify-content: center;
@@ -269,7 +257,7 @@ header p {
 }
 
 /* ------------------------------------------------------------------
-   5. Buttons System
+   4. Buttons System
    ------------------------------------------------------------------ */
 .btn{--_bg:var(--card-alt);--_bg-hover:var(--card);--_fg:var(--text);--_bd:var(--card-border);
   display:inline-flex;align-items:center;justify-content:center;gap:.35em;
@@ -298,7 +286,7 @@ header p {
 #exportBtn:hover,#importBtn:hover,#budgetBtn:hover{background:var(--card);color:#000}
 
 /* ------------------------------------------------------------------
-   6. Form (Floating Labels)
+   5. Form (Floating Labels)
    ------------------------------------------------------------------ */
 form{
   width:100%;
@@ -388,7 +376,7 @@ form{
 .error[hidden]{display:none!important}
 
 /* Map grid areas (IDs expected in HTML) */
-#descInput.field,#name.field{grid-area:desc;} /* fallback ID mapping if needed */
+#descInput.field,#name.field{grid-area:desc;} 
 #amountInput.field{grid-area:amt;}
 #typeInput.field{grid-area:type;}
 #categoryInput.field{grid-area:cat;}
@@ -408,7 +396,7 @@ button[type=submit]:hover{filter:brightness(1.05);}
 button[type=submit]:active{transform:scale(.97);} 
 
 /* ------------------------------------------------------------------
-   7. Summary Cards + Budget Bars
+   6. Summary Cards + Budget Bars
    ------------------------------------------------------------------ */
 .summary-section {
   display: grid;
@@ -480,7 +468,7 @@ button[type=submit]:active{transform:scale(.97);}
 .budget-row.over .bar::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(-45deg,transparent 0 6px,rgba(255,255,255,.35) 6px 12px);mix-blend-mode:overlay;} 
 
 /* ------------------------------------------------------------------
-   8. Filter Row
+   7. Filter Row
    ------------------------------------------------------------------ */
 .filter-section {
   display: flex;
@@ -488,7 +476,7 @@ button[type=submit]:active{transform:scale(.97);}
   gap: var(--sp-2);
   margin-block: var(--sp-6) var(--sp-4);
   flex-wrap: wrap;
-  justify-content: flex-start; /* Ensures left alignment */
+  justify-content: flex-start; 
 }
 
 .filter-section label {
@@ -499,7 +487,7 @@ button[type=submit]:active{transform:scale(.97);}
 }
 
 .filter-section select {
-  padding: .55em 2.2em .55em .9em; /* less left padding */
+  padding: .55em 2.2em .55em .9em; 
   min-width: 110px;
   font-size: var(--fs-sm);
   border: 1px solid var(--card-border);
@@ -512,7 +500,7 @@ button[type=submit]:active{transform:scale(.97);}
 .filter-section select:focus{border-color:var(--brand-1);background:var(--card);} 
 
 /* ------------------------------------------------------------------
-   9. Chart Card
+   8. Chart Card
    ------------------------------------------------------------------ */
 .chart-section {
   display: flex;
@@ -544,12 +532,12 @@ button[type=submit]:active{transform:scale(.97);}
   max-height: 340px;
   display: block;
   margin-inline: auto;
-  margin-bottom: 1rem; /* Add space below chart for legend */
+  margin-bottom: 1rem; 
   background: transparent;
 }
 
 /* ------------------------------------------------------------------
-   10. Entries List
+   9. Entries List
    ------------------------------------------------------------------ */
 .entries-section ul {
   list-style: none;
@@ -655,11 +643,7 @@ button[type=submit]:active{transform:scale(.97);}
 }
 
 /* ------------------------------------------------------------------
-   11. Budget Dialog
-   ------------------------------------------------------------------ */
-
-/* ------------------------------------------------------------------
-   12. Misc / Helpers
+   10. Misc / Helpers
    ------------------------------------------------------------------ */
 body.loading{cursor:progress;}
 .fade-in{animation:fade-in var(--dur-med) ease both;} 
@@ -672,10 +656,10 @@ body.loading{cursor:progress;}
 }
 
 /* ------------------------------------------------------------------
-   13. Legacy compatibility overrides
+   11. Legacy compatibility overrides
    ------------------------------------------------------------------ */
 /* maintain old selectors so nothing breaks while HTML still references them */
-.header-actions button:hover{color:var(--text-invert);} /* keep hover contrast */
+.header-actions button:hover{color:var(--text-invert);} 
 
 /* repeat field minor padding fix */
 .field select#repeatInput{padding-right:2.2rem;}
@@ -701,7 +685,7 @@ body.loading{cursor:progress;}
   flex-direction: column;
   width: 100%;
   position: relative;
-  margin-bottom: 0; /* Remove if you want gap only from .form-section form */
+  margin-bottom: 0; 
 }
 
 .field label {
@@ -783,10 +767,7 @@ input[type="number"]::placeholder { color: var(--text-3); }
 
 
 /* ==================================================================
-   SELECT ENHANCEMENT LAYER
-   ------------------------------------------------------------------
-   Improves readability & focus styling for all dropdowns
-   (Type, Category, Repeat, Filter) without altering existing look.
+   12. SELECT ENHANCEMENT LAYER
    ------------------------------------------------------------------ */
 
 /* Shared custom arrow (light) */
@@ -875,8 +856,7 @@ body.dark-mode .filter-section select option:checked {
   }
 }
 /* ===============================================================
-   FILTER SECTION ENHANCEMENTS FOR MULTI-FILTER UI
-   (Appended non-destructive overrides)
+   12. FILTER SECTION ENHANCEMENTS FOR MULTI-FILTER UI
    =============================================================== */
 
 /* Layout: wrap nicely; align items baseline */

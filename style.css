@@ -178,6 +178,8 @@ header h1, .gradient-text {
     0 1px 0px #fff; 
   filter: none;
   display: inline-block;  
+  line-height: 1.15;
+  letter-spacing: 0.005em;
 }
 
 header p {
@@ -248,9 +250,7 @@ header p {
     box-sizing: border-box;
     display: inline-block;
   }
-  header h1 {
-    font-size: 2rem;
-  }
+  
   header p {
     font-size: var(--fs-sm);
   }
@@ -373,11 +373,12 @@ form{
 }
 
 .field input::placeholder {
-  color: transparent;          /* nothing on load */
+  color: transparent;           
   transition: color .15s ease;
+  display: none;
 }
 .field input:focus::placeholder {
-  color: var(--text-3);        /* faint hint _while focused_ */
+  color: var(--text-3);        
 }
 
 .field small.error{display:block;margin-top:var(--sp-1);font-size:var(--fs-xs);color:var(--danger);}/* error msg */
@@ -1054,3 +1055,46 @@ body.dark-mode .filter-section select option:checked {
 
 .filter-container .filter-section       { display: none; }
 .filter-container.open .filter-section  { display: grid; }
+
+@media (max-width:600px){
+  /* one-column grid */
+  .filter-section{
+    grid-template-columns:1fr;
+    gap: var(--sp-3) !important;       /* tighter vertical rhythm */
+  }
+
+  /* make every field full-width */
+  .filter-field,
+  .filter-field.filter-range,
+  .filter-field.filter-search,
+  .filter-clear{
+    grid-column:1 / -1;                /* span entire grid */
+    width:100%;
+  }
+
+  /* align the Clear button visually with inputs */
+  .filter-clear{
+    text-align:center;
+    margin-top:var(--sp-1);
+  }
+  
+  .field input,
+  .field select {
+    font-size: 16px !important;         
+  }
+}
+
+.field input:focus + label,
+.field input:not(:placeholder-shown) + label,
+.field select:focus + label,
+.field select:not(:invalid) + label {
+  top: -1rem;
+  left: .5rem;
+  font-size: var(--fs-xs);
+  color: rgb(232, 249, 0);              
+}
+
+.field input::placeholder {
+  color: transparent;
+  display: none; 
+}

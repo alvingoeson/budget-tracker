@@ -227,6 +227,28 @@ header p {
   box-shadow: 0 6px 24px rgba(49,130,206,0.14);
 }
 
+.logo {
+  /* fixed size circle */
+  width: 84px;
+  height: 84px;
+  background: #fff;
+  border-radius: 50%;
+  margin-bottom: 25px;
+
+  /* center the <img> inside */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ensure the PNG scales nicely */
+.logo img {
+  width: 60px;    /* tweak as needed to taste */
+  height: 60px;
+  object-fit: contain;
+  border-radius: 0; /* remove any rounding here */
+}
+
 /* Responsive: stack header actions and reduce size on mobile */
 @media (max-width: 600px) {
   header {

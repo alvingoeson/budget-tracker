@@ -228,25 +228,29 @@ header p {
 }
 
 .logo {
-  /* fixed size circle */
-  width: 84px;
-  height: 84px;
-  background: #fff;
-  border-radius: 50%;
-  margin-bottom: 25px;
+  /* Fixed 64×64 circle, no matter the screen size */
+  width: 5rem !important;           /* 4rem ≈ 64px */
+  height: 5rem !important;
+  background: #fff !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  margin-bottom: 25px !important;
 
-  /* center the <img> inside */
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  /* Center the image inside */
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
-/* ensure the PNG scales nicely */
 .logo img {
-  width: 60px;    /* tweak as needed to taste */
-  height: 60px;
-  object-fit: contain;
-  border-radius: 0; /* remove any rounding here */
+  /* Max 70% of the container—keeps padding around it */
+  max-width: 80% !important;
+  max-height: 80% !important;
+
+  /* Let the image keep its aspect ratio */
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
 }
 
 /* Responsive: stack header actions and reduce size on mobile */

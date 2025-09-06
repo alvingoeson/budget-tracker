@@ -166,7 +166,7 @@ importFile.addEventListener('change', e=>{
 /* ----- Category seeds (for entry form only) ----- */
 const cats = {
   income : ['Salary','Freelance','Investment','Gift','Interest','Other'],
-  expense: ['Food','Rent','Utilities','Transportation','Entertainment','Health','Education','Subscriptions','Shopping','Other']
+  expense: ['Food','Rent','Utilities','Transportation','Entertainment','Health','Education','Subscriptions','Shopping','Remittance','Other']
 };
 
 /* ----- Populate entry-form Category options based on Type ----- */

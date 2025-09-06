@@ -21,6 +21,7 @@ const exportBtn     = document.getElementById('exportBtn');
 const importBtn     = document.getElementById('importBtn');
 const importFile    = document.getElementById('importFile');
 const themeToggle   = document.getElementById('themeToggle');
+const clearBtn      = document.getElementById('clearBtn'); // NEW
 
 const filterContainer = document.querySelector('.filter-container');
 const filterToggle    = document.getElementById('filterToggle');
@@ -31,12 +32,12 @@ filterToggle.addEventListener('click', () => {
 });
 
 /* Filter controls */
-const filterType    = document.getElementById('filterType');    // new
-const filterInput   = document.getElementById('filterInput');   // category
-const filterFrom    = document.getElementById('filterFrom');    // date from
-const filterTo      = document.getElementById('filterTo');      // date to
-const filterSearch  = document.getElementById('filterSearch');  // text
-const filterClear   = document.getElementById('filterClear');   // clear btn
+const filterType    = document.getElementById('filterType');
+const filterInput   = document.getElementById('filterInput');
+const filterFrom    = document.getElementById('filterFrom');
+const filterTo      = document.getElementById('filterTo');
+const filterSearch  = document.getElementById('filterSearch');
+const filterClear   = document.getElementById('filterClear');
 
 /* ----- Storage keys ----- */
 const STORAGE_KEY = 'budget-entries';
@@ -56,9 +57,7 @@ function cssVar(name){
   return getComputedStyle(document.body).getPropertyValue(name).trim();
 }
 function parseISODateOnly(str){
-  // Accept ISO or yyyy-mm-dd; return Date or null
   if(!str) return null;
-  // Some entries have full ISO with time; Date(...) handles both
   const d = new Date(str);
   return isNaN(d) ? null : d;
 }
@@ -163,6 +162,22 @@ importFile.addEventListener('change', e=>{
   importFile.value='';
 });
 
+/* ----- NEW: Clear-all handler ----- */
+clearBtn.addEventListener('click', () => {
+  const ok = confirm(
+    'This will delete ALL saved entries and recurring rules in this browser for this app. Your theme setting will be kept.\n\nProceed?'
+  );
+  if (!ok) return;
+  // wipe app data
+  entries = [];
+  recurring = [];
+  localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(RECUR_KEY);
+  // re-render clean state
+  applyFiltersAndRender();
+  alert('All entries cleared.');
+});
+
 /* ----- Category seeds (for entry form only) ----- */
 const cats = {
   income : ['Salary','Freelance','Investment','Gift','Interest','Other'],
@@ -186,8 +201,6 @@ function fillCats() {
 typeInput.addEventListener('change', fillCats);
 
 /* ===== FILTER SYSTEM ===== */
-
-/* Build the Category filter choices from current entries (respecting Type filter) */
 function rebuildFilterCategory() {
   const prior = filterInput.value;
   const typeVal = filterType.value;
@@ -200,11 +213,9 @@ function rebuildFilterCategory() {
   filterInput.innerHTML = catOptions
     .map(v => `<option value="${v}">${v === 'all' ? 'All' : v}</option>`)
     .join('');
-  // restore selection if still present; else All
   filterInput.value = catOptions.includes(prior) ? prior : 'all';
 }
 
-/* Constrain date pickers to data range; preserve chosen values if valid */
 function setFilterDateBounds() {
   if(!entries.length){
     filterFrom.min = filterFrom.max = filterTo.min = filterTo.max = '';
@@ -217,12 +228,10 @@ function setFilterDateBounds() {
   const maxISO = ymd(maxDate);
   filterFrom.min = filterTo.min = minISO;
   filterFrom.max = filterTo.max = maxISO;
-  // Clamp existing values if out of range
   if(filterFrom.value && filterFrom.value < minISO) filterFrom.value = minISO;
   if(filterTo.value   && filterTo.value   > maxISO) filterTo.value   = maxISO;
 }
 
-/* Collect & apply all filters, returning the filtered array */
 function getFilteredEntries(){
   let out = [...entries];
 
@@ -239,7 +248,6 @@ function getFilteredEntries(){
     out = out.filter(e => new Date(e.date) >= fromDate);
   }
   if(toVal){
-    // inclusive end-of-day
     const toDate = new Date(toVal + 'T23:59:59.999');
     out = out.filter(e => new Date(e.date) <= toDate);
   }
@@ -252,7 +260,7 @@ function getFilteredEntries(){
   return out;
 }
 
-/* Event wiring */
+/* Events */
 [filterType, filterInput, filterFrom, filterTo].forEach(el=>{
   el.addEventListener('change', applyFiltersAndRender);
 });

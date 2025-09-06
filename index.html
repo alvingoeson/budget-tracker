@@ -9,26 +9,27 @@
   <link rel="apple-touch-icon" 
         href="icons/icon-180.png" 
         sizes="180x180" />
-   <link rel="icon" 
+  <link rel="icon" 
         type="image/png" 
         href="icons/icon-180.png" 
-        sizes="180x180" />     
-
+        sizes="180x180" />
 </head>
 <body>
   <div class="container">
     <header>
       <span class="logo">
-        <!-- simplified to a single <img> -->
         <img src="icons/icon-180.png" alt="Budget Tracker Logo" />
       </span>
       <h1>Budget <span class="gradient-text">Tracker</span></h1>
       <p>Log income &amp; expenses — your data stays in your local browser storage.</p>
+
       <div class="header-actions">
         <button id="themeToggle" aria-label="Toggle dark mode">🌙</button>
         <button id="exportBtn">Export CSV</button>
         <button id="importBtn">Import CSV</button>
         <input id="importFile" type="file" accept=".csv" hidden />
+        <!-- NEW: clear storage button -->
+        <button id="clearBtn" aria-label="Clear all saved entries">Clear All Data</button>
       </div>
     </header>
 
@@ -86,48 +87,47 @@
     <!-- Summary cards injected by JS -->
     <section id="summary" class="summary-section"></section>
 
-    <!-- ===== Filters (collapsible wrapper) ===== -->
+    <!-- Filters -->
     <div class="filter-container collapsed">
       <button id="filterToggle" class="btn btn-ghost filter-toggle" aria-expanded="false">
         ⚙️ Set Filters
       </button>
 
-    
-    <!-- Filters -->
-    <section class="filter-section">
-      <div class="filter-field">
-        <label for="filterType">Type</label>
-        <select id="filterType">
-          <option value="all">All</option>
-          <option value="income">Income</option>
-          <option value="expense">Expense</option>
-        </select>
-      </div>
+      <section class="filter-section">
+        <div class="filter-field">
+          <label for="filterType">Type</label>
+          <select id="filterType">
+            <option value="all">All</option>
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
+          </select>
+        </div>
 
-      <div class="filter-field">
-        <label for="filterInput">Category</label>
-        <select id="filterInput">
-          <option value="all">All</option>
-        </select>
-      </div>
+        <div class="filter-field">
+          <label for="filterInput">Category</label>
+          <select id="filterInput">
+            <option value="all">All</option>
+          </select>
+        </div>
 
-      <div class="filter-field filter-range">
-        <label for="filterFrom">From</label>
-        <input type="date" id="filterFrom" />
-      </div>
+        <div class="filter-field filter-range">
+          <label for="filterFrom">From</label>
+          <input type="date" id="filterFrom" />
+        </div>
 
-      <div class="filter-field filter-range">
-        <label for="filterTo">To</label>
-        <input type="date" id="filterTo" />
-      </div>
+        <div class="filter-field filter-range">
+          <label for="filterTo">To</label>
+          <input type="date" id="filterTo" />
+        </div>
 
-      <div class="filter-field filter-search">
-        <label for="filterSearch">Search</label>
-        <input type="text" id="filterSearch" placeholder="Description…" />
-      </div>
+        <div class="filter-field filter-search">
+          <label for="filterSearch">Search</label>
+          <input type="text" id="filterSearch" placeholder="Description…" />
+        </div>
 
-      <button type="button" id="filterClear" class="btn btn-ghost btn-small filter-clear">Clear</button>
-    </section>
+        <button type="button" id="filterClear" class="btn btn-ghost btn-small filter-clear">Clear</button>
+      </section>
+    </div>
 
     <!-- Entries -->
     <section class="entries-section">
